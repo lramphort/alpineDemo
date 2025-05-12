@@ -1,0 +1,209 @@
+# Alpine.js Cheat Sheet
+
+## Directives de base
+### x-data
+Déclare un nouveau composant Alpine et ses données
+```html
+<div x-data="{ open: false }">
+    ...
+</div>
+```
+
+### x-bind
+Définit dynamiquement des attributs HTML
+```html
+<div x-bind:class="!open ? 'hidden' : ''">
+  ...
+</div>
+```
+
+### x-on
+Écoute les événements du navigateur
+```html
+<button x-on:click="open = !open">
+  Toggle
+</button>
+```
+
+## Manipulation de contenu
+### x-text
+Définit le contenu texte d'un élément
+```html
+<div>
+  Copyright ©
+  <span x-text="new Date().getFullYear()"></span>
+</div>
+```
+
+### x-html
+Définit le HTML interne d'un élément
+```html
+<div x-html="(await axios.get('/some/html/partial')).data">
+  ...
+</div>
+```
+
+### x-model
+Synchronise des données avec un élément input
+```html
+<div x-data="{ search: '' }">
+  <input type="text" x-model="search">
+  Searching for: <span x-text="search"></span>
+</div>
+```
+
+## Affichage conditionnel
+### x-show
+Affiche/masque un élément
+```html
+<div x-show="open">
+  ...
+</div>
+```
+
+### x-transition
+Applique des transitions CSS
+```html
+<div x-show="open" x-transition>
+  ...
+</div>
+```
+
+### x-if
+Ajoute/supprime conditionnellement un bloc HTML
+```html
+<template x-if="open">
+  <div>...</div>
+</template>
+```
+
+## Boucles
+### x-for
+Répète un bloc HTML basé sur un jeu de données
+```html
+<template x-for="post in posts">
+  <h2 x-text="post.title"></h2>
+</template>
+```
+
+## Initialisation et effets
+### x-init
+Exécute du code à l'initialisation
+```html
+<div x-init="date = new Date()"></div>
+```
+
+### x-effect
+Exécute un script quand ses dépendances changent
+```html
+<div x-effect="console.log('Count is '+count)"></div>
+```
+
+## Références
+### x-ref
+Référence des éléments directement
+```html
+<input type="text" x-ref="content">
+<button x-on:click="navigator.clipboard.writeText($refs.content.value)">
+  Copy
+</button>
+```
+
+## Utilitaires
+### x-cloak
+Masque un bloc HTML jusqu'à l'initialisation complète
+```html
+<div x-cloak>
+  ...
+</div>
+```
+
+### x-ignore
+Empêche l'initialisation Alpine d'un bloc HTML
+```html
+<div x-ignore>
+  ...
+</div>
+```
+
+## Propriétés magiques
+### $store
+Accède à un store global
+```html
+<h1 x-text="$store.site.title"></h1>
+```
+
+### $el
+Référence l'élément DOM courant
+```html
+<div x-init="new Pikaday($el)"></div>
+```
+
+### $dispatch
+Déclenche un événement personnalisé
+```html
+<div x-on:notify="...">
+  <button x-on:click="$dispatch('notify')">...</button>
+</div>
+```
+
+### $watch
+Surveille une donnée et exécute un callback
+```html
+<div x-init="$watch('count', value => {
+  console.log('count is ' + value)
+})">...</div>
+```
+
+### $refs
+Référence un élément par sa clé
+```html
+<div x-init="$refs.button.remove()">
+  <button x-ref="button">Remove Me</button>
+</div>
+```
+
+### $nextTick
+Attend le prochain rendu navigateur
+```html
+<div
+  x-text="count"
+  x-text="$nextTick(() => {
+    console.log('count is ' + $el.textContent)
+  })"
+>...</div>
+```
+
+## Fonctions globales
+### Alpine.data
+Réutilise un objet de données
+```html
+<div x-data="dropdown">
+  ...
+</div>
+
+<script>
+Alpine.data('dropdown', () => ({
+  open: false,
+  toggle() { 
+    this.open = !this.open
+  }
+}))
+</script>
+```
+
+### Alpine.store
+Déclare des données globales réactives
+```html
+<button @click="$store.notifications.notify('...')">
+  Notify
+</button>
+
+<script>
+Alpine.store('notifications', {
+  items: [],
+  notify(message) { 
+    this.items.push(message)
+  }
+})
+</script>

@@ -1,0 +1,89 @@
+<!-- 
+TODO
+
+https://boringapi.com/api/v1/static/photos/{(image_count %300) +1}.jpeg
+
+image_count incrémente quand on clique sur ajouter une photo
+
+--> 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galerie Photo</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Poppins:wght@500&display=swap">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <h1>Galerie Photo</h1>
+
+    <div x-data="galleryApp">
+        <!-- Section pour afficher les photos -->
+        <div class="gallery" style="margin-bottom: 2rem;">
+            <template x-for="photo in photos">
+                <img :src="photo.url" :alt="photo.title" @click="openModal(photo)">
+            </template>
+        </div>
+    
+        <!-- Formulaire pour ajouter des images -->
+        <form @submit.prevent="addPhoto">
+            <input type="text" placeholder="Titre" x-model="newPhoto.title">
+            <input type="text" placeholder="Description" x-model="newPhoto.description">
+            <select x-model="newPhoto.author" required>
+                <option value="" disabled selected>Sélectionnez un auteur</option>
+                <template x-for="author in authors">
+                    <option :value="`${author}`" x-text="`${author}`"></option>
+                </template>
+            </select>
+            <button>Ajouter</button>
+        </form>
+
+        <!-- Formulaire pour ajouter des auteurs -->
+        <div>
+            <h2>Ajouter un Auteur</h2>
+            <form @submit.prevent="handleAuthorSubmit()">
+                <input type="text" placeholder="Nom de l'auteur" x-model="newAuthorName" required>
+                <button>Ajouter</button>
+                <span x-show="successMessage" style="color: green">Auteur ajouté!</span>
+                <span x-show="errorMessage" style="color: red">Erreur: auteur existe déjà ou nom invalide</span>
+            </form>
+        </div>
+
+        <!-- Liste des auteurs -->
+        <h2>Liste des Auteurs</h2>
+        <ul>
+            <template x-for="author in authors" :key="author">
+                <li>
+                    <span x-text="`${author} - ${getPhotoCount(author)} photos`"></span>
+                    <button @click="deleteAuthor(author)" class="delete-btn">×</button>
+                </li>
+            </template>
+        </ul>
+
+        <!-- Modal pour afficher une photo en grand -->
+        <div x-show="selectedPhoto !== null"
+            class="modal"
+            @click.away="selectedPhoto = null"
+            x-transition
+            x-bind:class="{'modal-open': selectedPhoto !== null}">
+            <div class="modal-content" @click.stop>
+                <template x-if="selectedPhoto">
+                    <div>
+                        <h3 x-text="selectedPhoto.title"></h3>
+                        <p x-text="selectedPhoto.description"></p>
+                        <img :src="selectedPhoto.url" :alt="selectedPhoto.title">
+                        <p>Auteur: <span x-text="selectedPhoto.author"></span></p>
+                        <button @click="selectedPhoto = null">Fermer</button>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</body>
+</html>
